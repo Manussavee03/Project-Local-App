@@ -52,17 +52,17 @@ function CategoryMenu() {
 function Gallery() {
   const galleryItems = [
     {
-      src: "gallery1.jpg",
+      src: "/src/assets/gallery1.jpg",
       title: "Beach Paradise",
       desc: "Relax and enjoy the beautiful beach.",
     },
     {
-      src: "gallery2.jpg",
+      src: "/src/assets/gallery2.jpg",
       title: "Cultural Heritage",
       desc: "Explore the rich cultural heritage of the city.",
     },
     {
-      src: "gallery3.jpg",
+      src: "/src/assets/gallery3.jpg",
       title: "Nature Adventure",
       desc: "Discover breathtaking nature landscapes.",
     },
@@ -90,7 +90,7 @@ function Home() {
       <main className="main-content">
         <div className="featured-container">
           <div className="featured-image">
-            <img src="beach.jpg" alt="Beach View" />
+            <img src="/src/assets/beach.jpg" alt="Beach View" />
           </div>
           <Gallery />
         </div>
@@ -125,37 +125,40 @@ function Login_() {
   };
 
   return (
-    <div className="auth-body">
-      <div className="auth-container">
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <h2>Login</h2>
-          <p>กรุณาเข้าสู่ระบบด้วยอีเมลและรหัสผ่าน</p>
-          <InputField
-            type="email"
-            name="email"
-            placeholder="Email"
-            icon="fas fa-envelope"
-            handleChange={handleChange}
-            value={formData.email}
-          />
-          <InputField
-            type="password"
-            name="password"
-            placeholder="Password"
-            icon="fas fa-lock"
-            handleChange={handleChange}
-            value={formData.password}
-          />
-          <button type="submit" className="auth-btn">
-            Login
-          </button>
-          {errorMessage && <p className="error-message">{errorMessage}</p>}
-          <div className="extra-links">
-            <Link to="/register">สมัครสมาชิก</Link>
-          </div>
-        </form>
+    
+      <div className="auth-body">
+        <div className="auth-container">
+          <form className="auth-form" onSubmit={handleSubmit}>
+            <h2>Login</h2>
+            <p>กรุณาเข้าสู่ระบบด้วยอีเมลและรหัสผ่าน</p>
+            <InputField
+              type="email"
+              name="email"
+              placeholder="Email"
+              icon="fas fa-envelope"
+              handleChange={handleChange}
+              value={formData.email}
+            />
+            <InputField
+              type="password"
+              name="password"
+              placeholder="Password"
+              icon="fas fa-lock"
+              handleChange={handleChange}
+              value={formData.password}
+            />
+            <button type="submit" className="auth-btn">
+              Login
+            </button>
+            {errorMessage && <p className="error-message">{errorMessage}</p>}
+            <div className="extra-links">
+              <Link to="/register">สมัครสมาชิก</Link>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+
+    
   );
 }
 

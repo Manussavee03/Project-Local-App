@@ -6,14 +6,20 @@
 }
 
 /* ---- แยกสไตล์ของหน้า Login & Register ---- */
+
+
 .auth-body {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #007bff, #0056b3);
+  
+  background: linear-gradient(535deg, #007bff, #0056b3);
 }
-
 .auth-container {
   background: #ffffff;
   padding: 40px;
