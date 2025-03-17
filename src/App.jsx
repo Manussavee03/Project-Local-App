@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "./App.css";
+import { auth } from "./firebase";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 
 // ส่วน InputField ใช้ร่วมกัน
 function InputField({ type, name, placeholder, icon, handleChange, value }) {
@@ -115,68 +117,50 @@ function Login_() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.email.trim() === "" || formData.password.trim() === "") {
       setErrorMessage("กรุณากรอกอีเมลและรหัสผ่าน!");
       return;
     }
-    window.location.href = "/home";
+    try {
+      await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      window.location.href = "/home";
+    } catch (error) {
+      setErrorMessage("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+    }
   };
 
   return (
-    
-      <div className="auth-body">
-        <div className="auth-container">
-          <form className="auth-form" onSubmit={handleSubmit}>
-            <h2>Login</h2>
-            <p>กรุณาเข้าสู่ระบบด้วยอีเมลและรหัสผ่าน</p>
-            <InputField
-              type="email"
-              name="email"
-              placeholder="Email"
-              icon="fas fa-envelope"
-              handleChange={handleChange}
-              value={formData.email}
-            />
-            <InputField
-              type="password"
-              name="password"
-              placeholder="Password"
-              icon="fas fa-lock"
-              handleChange={handleChange}
-              value={formData.password}
-            />
-            <button type="submit" className="auth-btn">
-              Login
-            </button>
-            {errorMessage && <p className="error-message">{errorMessage}</p>}
-            <div className="extra-links">
-              <Link to="/register">สมัครสมาชิก</Link>
-            </div>
-          </form>
-        </div>
+    <div className="auth-body">
+      <div className="auth-container">
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <h2>Login</h2>
+          <p>กรุณาเข้าสู่ระบบด้วยอีเมลและรหัสผ่าน</p>
+          <input type="email" name="email" placeholder="Email" onChange={handleChange} value={formData.email} />
+          <input type="password" name="password" placeholder="Password" onChange={handleChange} value={formData.password} />
+          <button type="submit" className="auth-btn">Login</button>
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
+          <div className="extra-links">
+            <Link to="/register">สมัครสมาชิก</Link>
+          </div>
+        </form>
       </div>
-
-    
+    </div>
   );
 }
 
+
 // ส่วน Register
 function Register() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-
+  const [formData, setFormData] = useState({ email: "", password: "", confirmPassword: "" });
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       setErrorMessage("รหัสผ่านไม่ตรงกัน!");
@@ -186,7 +170,13 @@ function Register() {
       setErrorMessage("กรุณากรอกข้อมูลให้ครบทุกช่อง!");
       return;
     }
-    alert("สมัครสมาชิกสำเร็จ!");
+    try {
+      await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      alert("สมัครสมาชิกสำเร็จ!");
+      window.location.href = "/";
+    } catch (error) {
+      setErrorMessage("สมัครสมาชิกไม่สำเร็จ! ลองใหม่อีกครั้ง");
+    }
   };
 
   return (
@@ -195,33 +185,10 @@ function Register() {
         <form className="auth-form" onSubmit={handleRegister}>
           <h2>Register</h2>
           <p>กรอกข้อมูลเพื่อสมัครสมาชิก</p>
-          <InputField
-            type="email"
-            name="email"
-            placeholder="Email"
-            icon="fas fa-envelope"
-            handleChange={handleChange}
-            value={formData.email}
-          />
-          <InputField
-            type="password"
-            name="password"
-            placeholder="Password"
-            icon="fas fa-lock"
-            handleChange={handleChange}
-            value={formData.password}
-          />
-          <InputField
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            icon="fas fa-lock"
-            handleChange={handleChange}
-            value={formData.confirmPassword}
-          />
-          <button type="submit" className="auth-btn">
-            สมัครสมาชิก
-          </button>
+          <input type="email" name="email" placeholder="Email" onChange={handleChange} value={formData.email} />
+          <input type="password" name="password" placeholder="Password" onChange={handleChange} value={formData.password} />
+          <input type="password" name="confirmPassword" placeholder="Confirm Password" onChange={handleChange} value={formData.confirmPassword} />
+          <button type="submit" className="auth-btn">สมัครสมาชิก</button>
           {errorMessage && <p className="error-message">{errorMessage}</p>}
           <div className="extra-links">
             <Link to="/">กลับไปหน้า Login</Link>
