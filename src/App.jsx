@@ -137,13 +137,22 @@ function Login_() {
         <form className="auth-form" onSubmit={handleSubmit}>
           <h2>Login</h2>
           <p>กรุณาเข้าสู่ระบบด้วยอีเมลและรหัสผ่าน</p>
-          <input type="email" name="email" placeholder="Email" onChange={handleChange} value={formData.email} />
-          <input type="password" name="password" placeholder="Password" onChange={handleChange} value={formData.password} />
+
+          <div class="input-group">
+            <input type="email" name="email" placeholder="Email" onChange={handleChange} value={formData.email} />
+          </div>
+
+          <div class="input-group">
+            <input type="password" name="password" placeholder="Password" onChange={handleChange} value={formData.password} />
+          </div>
+
           <button type="submit" className="auth-btn">Login</button>
           {errorMessage && <p className="error-message">{errorMessage}</p>}
           <div className="extra-links">
             <Link to="/register">สมัครสมาชิก</Link>
           </div>
+
+
         </form>
       </div>
     </div>
@@ -185,9 +194,19 @@ function Register() {
         <form className="auth-form" onSubmit={handleRegister}>
           <h2>Register</h2>
           <p>กรอกข้อมูลเพื่อสมัครสมาชิก</p>
-          <input type="email" name="email" placeholder="Email" onChange={handleChange} value={formData.email} />
-          <input type="password" name="password" placeholder="Password" onChange={handleChange} value={formData.password} />
-          <input type="password" name="confirmPassword" placeholder="Confirm Password" onChange={handleChange} value={formData.confirmPassword} />
+
+          <div class="input-group">
+            <input type="email" name="email" placeholder="Email" onChange={handleChange} value={formData.email} />
+          </div>
+
+          <div class="input-group">
+            <input type="password" name="password" placeholder="Password" onChange={handleChange} value={formData.password} />
+          </div>
+
+          <div class="input-group">
+            <input type="password" name="confirmPassword" placeholder="Confirm Password" onChange={handleChange} value={formData.confirmPassword} />
+          </div>
+
           <button type="submit" className="auth-btn">สมัครสมาชิก</button>
           {errorMessage && <p className="error-message">{errorMessage}</p>}
           <div className="extra-links">
