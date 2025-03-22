@@ -5,30 +5,45 @@ import { auth } from "./firebase";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 
 
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 
 
 function LogoutLink() {
-  const handleLogout = async () => {
+  const navigate = useNavigate();
+
+  const handleLogout = async (e) => {
+    e.preventDefault(); // ป้องกัน Link ทำงานก่อน logout
     try {
-      await signOut(auth); // ออกจากระบบ
+      await signOut(auth);
+      navigate("/"); // ✅ นำทางไปหน้าแรกหลัง logout
     } catch (error) {
       console.error("Logout Error:", error);
     }
   };
 
   return (
-    <Link to="/" onClick={handleLogout} style={{ color: "red", cursor: "pointer" }}>
+    <a href="#" onClick={handleLogout} style={{ color: "red", cursor: "pointer" }}>
       Logout
-    </Link>
+    </a>
   );
 }
 
 
 
+
 // ส่วน Header
 function Header() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <header className="header">
       <div className="logo">Logo</div>
@@ -37,8 +52,16 @@ function Header() {
       <nav className="nav-links">
         <Link to="#">About Us</Link>
         <Link to="#">TH/EN</Link>
-        <Link to="#">Profile</Link>
-        <LogoutLink /> {/* ✅ ใช้คอมโพเนนต์ที่ถูกต้อง */}
+
+        {user ? (
+          <>
+            <span>  {user.email}</span> {/*แสดงอีเมลของผู้ใช้ */}
+            <LogoutLink />
+          </>
+        ) : (
+          <Link to="/">Login</Link>
+        )}
+
       </nav>
     </header>
   );
