@@ -8,21 +8,24 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "fire
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 
-// ส่วน InputField ใช้ร่วมกัน
-function InputField({ type, name, placeholder, icon, handleChange, value }) {
+
+function LogoutLink() {
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); // ออกจากระบบ
+    } catch (error) {
+      console.error("Logout Error:", error);
+    }
+  };
+
   return (
-    <div className="input-group">
-      <i className={icon}></i>
-      <input
-        type={type}
-        name={name}
-        placeholder={placeholder}
-        onChange={handleChange}
-        value={value}
-      />
-    </div>
+    <Link to="/" onClick={handleLogout} style={{ color: "red", cursor: "pointer" }}>
+      Logout
+    </Link>
   );
 }
+
+
 
 // ส่วน Header
 function Header() {
@@ -35,6 +38,7 @@ function Header() {
         <Link to="#">About Us</Link>
         <Link to="#">TH/EN</Link>
         <Link to="#">Profile</Link>
+        <LogoutLink /> {/* ✅ ใช้คอมโพเนนต์ที่ถูกต้อง */}
       </nav>
     </header>
   );
@@ -153,7 +157,6 @@ function Login_() {
       await signInWithEmailAndPassword(auth, formData.email, formData.password);
       window.location.href = "/home";
     } catch (error) {
-      window.location.href = "/home";
       setErrorMessage("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
     }
   };
