@@ -4,6 +4,10 @@ import "./App.css";
 import { auth } from "./firebase";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 
+
+import { onAuthStateChanged } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+
 // ส่วน InputField ใช้ร่วมกัน
 function InputField({ type, name, placeholder, icon, handleChange, value }) {
   return (
@@ -83,8 +87,30 @@ function Gallery() {
   );
 }
 
+
+
+
 // ส่วน Home Page
 function Home() {
+
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        navigate("/"); // ถ้ายังไม่ได้ล็อกอิน ให้ไปที่หน้า login
+      } else {
+        setLoading(false);
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup listener
+  }, [navigate]);
+
+  if (loading) return <p>กำลังโหลด...</p>; // แสดงข้อความโหลดก่อน
+
+
   return (
     <div className="home">
       <Header />
@@ -127,6 +153,7 @@ function Login_() {
       await signInWithEmailAndPassword(auth, formData.email, formData.password);
       window.location.href = "/home";
     } catch (error) {
+      window.location.href = "/home";
       setErrorMessage("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
     }
   };
