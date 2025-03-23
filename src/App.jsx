@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "./App.css";
 import { auth } from "./firebase";
@@ -7,6 +7,7 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "fire
 
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+
 
 
 
@@ -294,6 +295,8 @@ function App() {
         <Route path="/" element={<Login_ />} />
         <Route path="/register" element={<Register />} />
         <Route path="/home" element={<Home />} />
+        
+        <Route path="*" element={<Navigate to="/home" replace />} /> {/* เส้นทางที่ไม่รู้จักให้กลับไปหน้า home */}
       </Routes>
     </Router>
   );
