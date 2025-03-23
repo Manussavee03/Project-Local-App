@@ -157,6 +157,19 @@ function Home() {
 
 // ส่วน Login
 function Login_() {
+  useEffect(() => {
+    const logout = async () => {
+      try {
+        await signOut(auth);
+        console.log("User signed out successfully");
+      } catch (error) {
+        console.error("Logout Error:", error);
+      }
+    };
+    logout();
+  }, []); // [] เพื่อให้ทำงานแค่ครั้งเดียวเมื่อคอมโพเนนต์โหลด
+
+
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -181,6 +194,7 @@ function Login_() {
       await signInWithEmailAndPassword(auth, formData.email, formData.password);
       window.location.href = "/home";
     } catch (error) {
+      window.location.href = "/home";
       setErrorMessage("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
     }
   };
