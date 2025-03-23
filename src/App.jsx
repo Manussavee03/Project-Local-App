@@ -231,6 +231,20 @@ function Login_() {
 
 // ส่วน Register
 function Register() {
+  useEffect(() => {
+    const logout = async () => {
+      try {
+        await signOut(auth);
+        console.log("User signed out successfully");
+      } catch (error) {
+        console.error("Logout Error:", error);
+      }
+    };
+    logout();
+  }, []); // [] เพื่อให้ทำงานแค่ครั้งเดียวเมื่อคอมโพเนนต์โหลด
+
+
+
   const [formData, setFormData] = useState({ email: "", password: "", confirmPassword: "" });
   const [errorMessage, setErrorMessage] = useState("");
 
