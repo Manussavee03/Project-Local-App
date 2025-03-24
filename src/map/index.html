@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Longdo Map Search</title>
+    <style>
+        html, body { height: 100%; margin: 0; }
+        #map { height: 100%; }
+        #search-container {
+            position: absolute;
+            top: 10px;
+            left: 80px;
+            background: white;
+            padding: 10px;
+            box-shadow: 0px 0px 5px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+        #suggest {
+            display: none;
+            position: absolute;
+            background: white;
+            border: 1px solid #ccc;
+            width: 100%;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        #suggest a {
+            display: block;
+            padding: 5px;
+            text-decoration: none;
+            color: black;
+        }
+        #suggest a:hover { background: #f0f0f0; }
+    </style>
+    <script src="https://api.longdo.com/map3/?key=b1e0d8240ddfdec6d55983312c04dd7b"></script>
+</head>
+<body onload="init();">
+    <div id="map"></div>
+    <div id="search-container">
+        <input type="text" id="search" placeholder="ค้นหาสถานที่...">
+        <div id="suggest"></div>
+        <input type="text" id="area" placeholder="รหัส Geocode (เช่น 10)">
+        <input type="text" id="tag" placeholder="ประเภท (เช่น โรงแรม)">
+        <input type="text" id="span" placeholder="ขอบเขต (เช่น 100m)">
+        <input type="number" id="limit" placeholder="จำนวนผลลัพธ์" min="1">
+        <button onclick="doSearch()">ค้นหา</button>
+    </div>
+    <script>
+        var map, search, suggest;
+        
+        function init() {
+            map = new longdo.Map({
+                placeholder: document.getElementById('map')
+            });
+            search = document.getElementById('search');
+            suggest = document.getElementById('suggest');
+            
+            map.Search.language('th');
+            
+            search.onkeyup = function(event) {
+                if ((event || window.event).keyCode != 13) return;
+                doSearch(); 
+            };
+            
+            search.oninput = function() {
+                if (search.value.length < 3) {
+                    suggest.style.display = 'none';
+                    return;
+                }
+                map.Search.suggest(search.value, {
+                    area: document.getElementById('area').value
+                });
+            };
+            
+            map.Event.bind('suggest', function(result) {
+                if (result.meta.keyword != search.value) return;
+                
+                suggest.innerHTML = '';
+                for (var i = 0, item; item = result.data[i]; ++i) {
+                    var a = document.createElement('a');
+                    a.innerHTML = item.d;
+                    a.href = 'javascript:doSuggest("' + item.w + '")';
+                    suggest.appendChild(a);
+                }
+                suggest.style.display = 'block';
+            });
+        }
+        
+        function doSearch() {
+            map.Search.search(search.value, {
+                area: document.getElementById('area').value,
+                tag: document.getElementById('tag').value,
+                span: document.getElementById('span').value,
+                limit: document.getElementById('limit').value
+            });
+            suggest.style.display = 'none';
+        }
+        
+        function doSuggest(value) {
+            search.value = value;
+            doSearch();
+        }
+    </script>
+</body>
+</html>
+
+
