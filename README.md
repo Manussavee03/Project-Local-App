@@ -9,7 +9,7 @@ Project-Local-App-main/
 📄 vite.config.js          #ไฟล์คอนฟิกของ Vite, เป็น build tool
     📁 node_modules/           # เป็นที่เก็บ dependencies ที่ติดตั้งจาก npm
     📁 public/                 # ไฟล์ assets แบบ static ที่จะถูกเสิร์ฟตรงจาก root เช่น icon, รูปภาพ
-     └── 📄 vite.svg
+     📄 vite.svg
 📁 src/                    # โฟลเดอร์หลักของซอร์สโค้ด
    📁 assets/             # ไฟล์ภาพและสื่อที่ใช้ในแอป เช่น logo, banner
    📁 components/         # React components เช่น Navbar, Sidebar, Loader ฯลฯ
