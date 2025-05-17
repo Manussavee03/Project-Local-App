@@ -1,13 +1,14 @@
 import { BrowserRouter as Router, Routes, Route, Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { FaUserCircle } from "react-icons/fa";
+import axios from 'axios';
 import "./App.css";
 import { auth } from "./firebase";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
-  signOut,
+  signOut
 } from "firebase/auth";
 
 // LogoutLink
@@ -95,6 +96,7 @@ function CategoryMenu({ categories, selectedCategory, onSelectCategory }) {
 
 // Home with Search & Event Button
 function Home() {
+  const [user, setUser] = useState(null);  // <=== ต้องมีบรรทัดนี้
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
@@ -103,8 +105,10 @@ function Home() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user) navigate("/");
-      else setLoading(false);
+      if (!user) 
+        navigate("/");
+      else 
+        setLoading(false);
     });
     return () => unsubscribe();
   }, [navigate]);
@@ -126,7 +130,8 @@ function Home() {
       return;
     }
     const exact = allPlaces.find(p => p.title.toLowerCase() === term);
-    if (exact) navigate(`/detail/${exact.id}`);
+    if (exact) 
+      navigate(`/detail/${exact.id}`);
     else {
       const filtered = allPlaces.filter(p => p.title.toLowerCase().includes(term));
       setSearchResults(filtered);
@@ -320,15 +325,20 @@ function Profile() {
 
 // Login Page
 function Login_() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [errorMessage, setErrorMessage] = useState("");
+
   useEffect(() => {
     const logout = async () => {
-      try { await signOut(auth); } catch (error) { console.error("Logout Error", error); }
+      try {
+        await signOut(auth);
+      } catch (error) {
+        console.error("Logout Error", error);
+      }
     };
     logout();
   }, []);
-
-  const [formData, setFormData] = useState({ email: "", password: "" });
-  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -347,7 +357,7 @@ function Login_() {
     }
     try {
       await signInWithEmailAndPassword(auth, formData.email, formData.password);
-      window.location.href = "/home";
+      navigate("/home"); // ✅ React Router navigation
     } catch {
       setErrorMessage("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
     }
@@ -359,8 +369,12 @@ function Login_() {
         <form className="auth-form" onSubmit={handleSubmit}>
           <h2>Login</h2>
           <p>กรุณาเข้าสู่ระบบด้วยอีเมลและรหัสผ่าน</p>
-          <div className="input-group"><input type="email" name="email" placeholder="Email" onChange={handleChange} value={formData.email} /></div>
-          <div className="input-group"><input type="password" name="password" placeholder="Password" onChange={handleChange} value={formData.password} /></div>
+          <div className="input-group">
+            <input type="email" name="email" placeholder="Email" onChange={handleChange} value={formData.email} />
+          </div>
+          <div className="input-group">
+            <input type="password" name="password" placeholder="Password" onChange={handleChange} value={formData.password} />
+          </div>
           <button type="submit" className="auth-btn">Login</button>
           {errorMessage && <p className="error-message">{errorMessage}</p>}
           <div className="extra-links"><Link to="/register">สมัครสมาชิก</Link></div>
@@ -421,20 +435,142 @@ function Register() {
   );
 }
 
-// Event Components and sample data
-const initialEvents = [
-  { event_id: "e1", title: "ปั่นจักรยานชมเมือง", date: "2025-06-20", time: "08:00", location: "สวนสาธารณะกลางเมือง", description: "ร่วมกิจกรรมปั่นจักรยานเพื่อสุขภาพ" },
-];
+
+
+const postEventToFirestore = async (token, eventData, collectionName) => {
+  if (!token) {
+    alert("Please login first");
+    return;
+  }
+
+  try {
+    const firestoreData = {
+      fields: {
+        title: { stringValue: eventData.title },
+        date: { stringValue: eventData.date },
+        time: { stringValue: eventData.time },
+        location: { stringValue: eventData.location },
+        description: { stringValue: eventData.description }
+      }
+    };
+
+    const res = await axios.post(
+      `https://firestore.googleapis.com/v1/projects/local-app-4351c/databases/(default)/documents/${collectionName}`,
+      firestoreData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      }
+    );
+
+    const firestoreID = res.data.name.split("/").pop();
+    return { ...eventData, event_id: firestoreID };
+  } catch (err) {
+    console.error("🔥 Error posting to Firestore:", err.response?.data || err.message);
+    alert("❌ ไม่สามารถบันทึกข้อมูลกิจกรรมได้");
+  }
+};
+
+const patchEventToFirestore = async (token, eventData, docId, collectionName) => {
+  const firestoreData = {
+    fields: {
+      title: { stringValue: eventData.title },
+      date: { stringValue: eventData.date },
+      time: { stringValue: eventData.time },
+      location: { stringValue: eventData.location },
+      description: { stringValue: eventData.description }
+    }
+  };
+
+  await axios.patch(
+    `https://firestore.googleapis.com/v1/projects/local-app-4351c/databases/(default)/documents/${collectionName}/${docId}`,
+    firestoreData,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      }
+    }
+  );
+};
+
+const deleteEventFromFirestore = async (token, docId, collectionName) => {
+  await axios.delete(
+    `https://firestore.googleapis.com/v1/projects/local-app-4351c/databases/(default)/documents/${collectionName}/${docId}`,
+    {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    }
+  );
+};
+
+
+
 
 function EventList() {
-  const [events, setEvents] = useState(initialEvents);
+  const [user, setUser] = useState(null);
+  const [events, setEvents] = useState([]);
   const [editingEvent, setEditingEvent] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [token, setToken] = useState(null);
   const navigate = useNavigate();
 
-  const handleDelete = (id) => {
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+
+      if (currentUser) {
+        const idToken = await currentUser.getIdToken();
+        setToken(idToken);
+        fetchEvents(idToken); // ดึงกิจกรรม
+      } else {
+        setToken(null);
+        navigate("/login");
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const fetchEvents = async (idToken) => {
+  try {
+    const res = await axios.get(
+      `https://firestore.googleapis.com/v1/projects/local-app-4351c/databases/(default)/documents/events`,
+      {
+        headers: { Authorization: `Bearer ${idToken}` }
+      }
+    );
+
+    const parsedEvents = res.data.documents?.map(doc => {
+      const fields = doc.fields || {};
+      return {
+        event_id: doc.name.split("/").pop(),
+        title: fields.title?.stringValue || "",
+        date: fields.date?.stringValue || "",
+        time: fields.time?.stringValue || "",
+        location: fields.location?.stringValue || "",
+        description: fields.description?.stringValue || ""
+      };
+    }) || [];
+
+    setEvents(parsedEvents);
+  } catch (err) {
+    console.error("❌ Error fetching events:", err.response?.data || err.message);
+  }
+};
+
+
+  const handleDelete = async (id) => {
     if (window.confirm("คุณต้องการลบกิจกรรมนี้หรือไม่?")) {
-      setEvents(events.filter(e => e.event_id !== id));
+      try {
+        await deleteEventFromFirestore(token, id, "events");
+        setEvents(events.filter(e => e.event_id !== id));
+      } catch (err) {
+        console.error("❌ Delete failed:", err.response?.data || err.message);
+      }
     }
   };
 
@@ -448,12 +584,15 @@ function EventList() {
     setShowForm(true);
   };
 
-  const handleSave = (eventData) => {
+  const handleSave = async (eventData) => {
     if (editingEvent) {
-      setEvents(events.map(e => e.event_id === editingEvent.event_id ? eventData : e));
+      await patchEventToFirestore(token, eventData, editingEvent.event_id, "events");
+      setEvents(events.map(e => e.event_id === editingEvent.event_id ? { ...eventData, event_id: editingEvent.event_id } : e));
     } else {
-      setEvents([...events, { ...eventData, event_id: Date.now().toString() }]);
+      const savedEvent = await postEventToFirestore(token, eventData, "events");
+      setEvents([...events, savedEvent]);
     }
+
     setShowForm(false);
   };
 
@@ -462,14 +601,20 @@ function EventList() {
       <Header />
       <h2>กิจกรรม</h2>
       <button onClick={handleCreateNew} style={{ marginBottom: 15 }}>สร้างกิจกรรมใหม่</button>
-      {showForm && <EventForm event={editingEvent} onSave={handleSave} onCancel={() => setShowForm(false)} />}
+      {showForm && (
+        <EventForm
+          event={editingEvent}
+          onSave={handleSave}
+          onCancel={() => setShowForm(false)}
+        />
+      )}
       <ul>
         {events.map(event => (
           <li key={event.event_id} style={{ marginBottom: 15, borderBottom: "1px solid #ccc", paddingBottom: 10 }}>
-            <strong>{event.title}</strong><br/>
-            วันที่: {event.date} เวลา: {event.time}<br/>
-            สถานที่: {event.location}<br/>
-            รายละเอียด: {event.description}<br/>
+            <strong>{event.title}</strong><br />
+            วันที่: {event.date} เวลา: {event.time}<br />
+            สถานที่: {event.location}<br />
+            รายละเอียด: {event.description}<br />
             <button onClick={() => handleEdit(event)} style={{ marginRight: 8 }}>แก้ไข</button>
             <button onClick={() => handleDelete(event.event_id)}>ลบ</button>
           </li>
@@ -478,6 +623,8 @@ function EventList() {
     </div>
   );
 }
+
+
 
 function EventForm({ event, onSave, onCancel }) {
   const [formData, setFormData] = useState({
