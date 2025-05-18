@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Link, Navigate, useNavigate, us
 import { useState, useEffect } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import axios from 'axios';
+import logo from "./assets/logos.png"; 
 import "./App.css";
 
 import { auth } 
@@ -108,22 +109,38 @@ function LogoutLink() {
 // Header
 function Header() {
   const [user, setUser] = useState(null);
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
     return () => unsubscribe();
   }, []);
+
   return (
     <header className="header">
-      <div className="logo">Logo</div>
-      <input type="text" className="search-bar" placeholder="Search" />
-      <button className="search-btn">🔍</button>
+      <div className="logo">
+        {user && user.photoURL ? (
+          <img
+            src={user.photoURL}
+            alt="User Avatar"
+            className="user-avatar"
+          />
+        ) : (
+          <img
+            src="/assets/logos.jpg" // เปลี่ยนเป็น path ของโลโก้ของคุณ
+            alt="Raksana"
+            className="site-logo"
+          />
+        )}
+      </div>
+
       <nav className="nav-links">
-        <Link to="#">About Us</Link>
-        <Link to="#">TH/EN</Link>
         {user ? (
           <>
             <Link to="/profile" className="profile-link" title="โปรไฟล์ของคุณ">
-              <FaUserCircle size={24} style={{ verticalAlign: "middle", marginRight: 6 }} />
+              <FaUserCircle
+                size={24}
+                style={{ verticalAlign: "middle", marginRight: 6 }}
+              />
               <span>{user.email}</span>
             </Link>
             <LogoutLink />
@@ -346,7 +363,6 @@ function Home() {
 }
 
 
-// Detail Page
 function Detail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -359,6 +375,7 @@ function Detail() {
     { user: "User2", rating: 5, comment: "ประทับใจมาก" },
   ]);
   const [userRating, setUserRating] = useState(0);
+  const [userComment, setUserComment] = useState(""); // ช่องใส่ข้อความ
 
   useEffect(() => {
     getPlacesFromFirestore()
@@ -373,7 +390,6 @@ function Detail() {
 
   useEffect(() => {
     if (!loading) {
-      // รวมทุกหมวดหมู่เป็น array เดียว
       const allPlaces = Object.values(placesData).flat();
       const found = allPlaces.find((p) => p.id === id);
       setPlace(found || null);
@@ -381,18 +397,28 @@ function Detail() {
   }, [loading, placesData, id]);
 
   const handleRatingClick = (rate) => setUserRating(rate);
+
   const submitRating = () => {
     if (userRating === 0) {
       alert("กรุณาเลือกคะแนนก่อน");
       return;
     }
-    setReviews([...reviews, { user: "You", rating: userRating, comment: "ให้คะแนนจากผู้ใช้" }]);
-    alert(`ขอบคุณสำหรับการให้คะแนน ${userRating} ดาว!`);
+    if (userComment.trim() === "") {
+      alert("กรุณาเขียนรีวิวก่อน");
+      return;
+    }
+    const newReview = {
+      user: "You",
+      rating: userRating,
+      comment: userComment.trim(),
+    };
+    setReviews([...reviews, newReview]);
+    alert(`ขอบคุณสำหรับรีวิวและการให้คะแนน ${userRating} ดาว!`);
     setUserRating(0);
+    setUserComment(""); // ล้างข้อความ
   };
 
   if (loading) return <p>กำลังโหลดข้อมูลสถานที่...</p>;
-
   if (!place) return <p>ไม่พบข้อมูลสถานที่</p>;
 
   return (
@@ -402,13 +428,13 @@ function Detail() {
 
       <div className="detail-main">
         <div className="detail-image">
-          {place.imageUrl ? <img src={place.imageUrl} alt={place.title} /> : null}
+          {place.imageUrl && <img src={place.imageUrl} alt={place.title} />}
         </div>
 
         <div className="detail-text">
           <h2>{place.title}</h2>
           <p><strong>รายละเอียด:</strong> {place.description}</p>
-          <p><strong>ข้อมูลเพิ่มเติม:</strong>ยังไม่มีข้อมูลใส่</p>
+          <p><strong>ข้อมูลเพิ่มเติม:</strong> ยังไม่มีข้อมูลใส่</p>
           <p>
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.title)}`}
@@ -438,19 +464,27 @@ function Detail() {
         )}
 
         <div className="user-rating">
-          <h4>ให้คะแนนสถานที่นี้</h4>
+          <h4>ให้คะแนนและเขียนรีวิว</h4>
           <div className="stars-input">
             {[1, 2, 3, 4, 5].map((star) => (
               <Star key={star} filled={star <= userRating} onClick={() => handleRatingClick(star)} />
             ))}
           </div>
-          <button onClick={submitRating} className="submit-rating-btn">ส่งคะแนน</button>
+          <textarea
+            placeholder="เขียนความคิดเห็นของคุณ..."
+            value={userComment}
+            onChange={(e) => setUserComment(e.target.value)}
+            rows={4}
+            style={{ width: "100%", marginTop: 10 }}
+          />
+          <button onClick={submitRating} className="submit-rating-btn" style={{ marginTop: 10 }}>
+            ส่งรีวิว
+          </button>
         </div>
       </div>
     </div>
   );
 }
-
 
 function renderStars(count) {
   return (
