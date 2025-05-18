@@ -156,23 +156,66 @@ const placesData = {
     { id: 7, title: "ตลาดนัดกลางคืน", description: "สนุกกับการช็อปปิ้งและลิ้มรสอาหารท้องถิ่น", imageUrl: "/src/assets/lifestyle1.jpg" },
   ],
 };
-
 // CategoryMenu
 function CategoryMenu({ categories, selectedCategory, onSelectCategory }) {
   return (
     <nav className="category-menu">
-      <button className={selectedCategory === "All" ? "active" : ""} onClick={() => onSelectCategory("All")}>All</button>
+      <button
+        className={selectedCategory === "All" ? "active" : ""}
+        onClick={() => onSelectCategory("All")}
+      >
+        All
+      </button>
       {categories.map((c) => (
-        <button key={c} className={selectedCategory === c ? "active" : ""} onClick={() => onSelectCategory(c)}>{c}</button>
+        <button
+          key={c}
+          className={selectedCategory === c ? "active" : ""}
+          onClick={() => onSelectCategory(c)}
+        >
+          {c}
+        </button>
       ))}
     </nav>
   );
 }
 
-// Home with Search & Event Button
+export async function getPlacesFromFirestore() {
+  try {
+    const url =
+      "https://firestore.googleapis.com/v1/projects/local-app-4351c/databases/(default)/documents/Place";
+    const res = await axios.get(url);
+
+    const documents = res.data.documents || [];
+    const placesByCategory = {};
+
+    documents.forEach((doc) => {
+      const fields = doc.fields || {};
+      const id = doc.name.split("/").pop();
+      const title = fields.name?.stringValue || "name";
+      const description = fields.des?.stringValue || "des";
+      const category = fields.type?.stringValue || "type";
+      const imageUrl = fields.imge?.stringValue || "";
+
+      if (!placesByCategory[category]) placesByCategory[category] = [];
+
+      placesByCategory[category].push({
+        id,
+        title,
+        description,
+        imageUrl,
+      });
+    });
+
+    return placesByCategory;
+  } catch (error) {
+    console.error("Error fetching places from Firestore:", error);
+    return {};
+  }
+}
+
 function Home() {
-  const [user, setUser] = useState(null);  // <=== ต้องมีบรรทัดนี้
   const [loading, setLoading] = useState(true);
+  const [placesData, setPlacesData] = useState({});
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState(null);
@@ -180,10 +223,14 @@ function Home() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user) 
+      if (!user) {
         navigate("/");
-      else 
-        setLoading(false);
+      } else {
+        getPlacesFromFirestore().then((data) => {
+          setPlacesData(data);
+          setLoading(false);
+        });
+      }
     });
     return () => unsubscribe();
   }, [navigate]);
@@ -204,29 +251,45 @@ function Home() {
       setSearchResults(null);
       return;
     }
-    const exact = allPlaces.find(p => p.title.toLowerCase() === term);
-    if (exact) 
+    const exact = allPlaces.find((p) => p.title.toLowerCase() === term);
+    if (exact) {
       navigate(`/detail/${exact.id}`);
-    else {
-      const filtered = allPlaces.filter(p => p.title.toLowerCase().includes(term));
+    } else {
+      const filtered = allPlaces.filter((p) =>
+        p.title.toLowerCase().includes(term)
+      );
       setSearchResults(filtered);
     }
   };
 
-  const displayedPlaces = searchResults !== null
-    ? searchResults
-    : selectedCategory === "All"
-    ? allPlaces
-    : placesData[selectedCategory];
+  const displayedPlaces =
+    searchResults !== null
+      ? searchResults
+      : selectedCategory === "All"
+      ? allPlaces
+      : placesData[selectedCategory] || [];
 
   return (
     <div className="home">
       <Header />
-      <CategoryMenu categories={categories} selectedCategory={selectedCategory} onSelectCategory={setSelectedCategory} />
+      <CategoryMenu
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory}
+      />
 
       <button
         onClick={() => navigate("/events")}
-        style={{ margin: "15px 20px", padding: "10px 18px", backgroundColor: "#1abc9c", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
+        style={{
+          margin: "15px 20px",
+          padding: "10px 18px",
+          backgroundColor: "#1abc9c",
+          color: "white",
+          border: "none",
+          borderRadius: "6px",
+          cursor: "pointer",
+          fontWeight: "600",
+        }}
       >
         กิจกรรม
       </button>
@@ -241,11 +304,23 @@ function Home() {
         />
         <button
           type="submit"
-          style={{ padding: "8px 16px", backgroundColor: "#1abc9c", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
+          style={{
+            padding: "8px 16px",
+            backgroundColor: "#1abc9c",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontWeight: "600",
+          }}
         >
           ค้นหา
         </button>
-        {searchResults && searchResults.length === 0 && <p style={{ color: "red", marginTop: "8px" }}>ไม่พบสถานที่ที่ค้นหา</p>}
+        {searchResults && searchResults.length === 0 && (
+          <p style={{ color: "red", marginTop: "8px" }}>
+            ไม่พบสถานที่ที่ค้นหา
+          </p>
+        )}
       </form>
 
       {displayedPlaces.length === 0 ? (
@@ -254,10 +329,14 @@ function Home() {
         <div className="places-grid" style={{ padding: "0 20px 40px 20px" }}>
           {displayedPlaces.map((place) => (
             <div className="place-card" key={place.id}>
-              <img src={place.imageUrl} alt={place.title} />
+              {place.imageUrl ? (
+                <img src={place.imageUrl} alt={place.title} />
+              ) : null}
               <h3>{place.title}</h3>
               <p>{place.description}</p>
-              <button onClick={() => handleViewDetails(place.id)}>ดูข้อมูลเพิ่มเติม</button>
+              <button onClick={() => handleViewDetails(place.id)}>
+                ดูข้อมูลเพิ่มเติม
+              </button>
             </div>
           ))}
         </div>
@@ -266,21 +345,40 @@ function Home() {
   );
 }
 
+
 // Detail Page
 function Detail() {
   const { id } = useParams();
-  const placeId = parseInt(id, 10);
   const navigate = useNavigate();
-
-  let place = null;
-  Object.values(placesData).forEach(arr => arr.forEach(p => { if (p.id === placeId) place = p; }));
-  if (!place) return <p>ไม่พบข้อมูลสถานที่</p>;
+  const [placesData, setPlacesData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [place, setPlace] = useState(null);
 
   const [reviews, setReviews] = useState([
     { user: "User1", rating: 4, comment: "บรรยากาศดีมากครับ" },
     { user: "User2", rating: 5, comment: "ประทับใจมาก" },
   ]);
   const [userRating, setUserRating] = useState(0);
+
+  useEffect(() => {
+    getPlacesFromFirestore()
+      .then((data) => {
+        setPlacesData(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      // รวมทุกหมวดหมู่เป็น array เดียว
+      const allPlaces = Object.values(placesData).flat();
+      const found = allPlaces.find((p) => p.id === id);
+      setPlace(found || null);
+    }
+  }, [loading, placesData, id]);
 
   const handleRatingClick = (rate) => setUserRating(rate);
   const submitRating = () => {
@@ -293,6 +391,10 @@ function Detail() {
     setUserRating(0);
   };
 
+  if (loading) return <p>กำลังโหลดข้อมูลสถานที่...</p>;
+
+  if (!place) return <p>ไม่พบข้อมูลสถานที่</p>;
+
   return (
     <div className="detail-page">
       <Header />
@@ -300,7 +402,7 @@ function Detail() {
 
       <div className="detail-main">
         <div className="detail-image">
-          <img src={place.imageUrl} alt={place.title} />
+          {place.imageUrl ? <img src={place.imageUrl} alt={place.title} /> : null}
         </div>
 
         <div className="detail-text">
@@ -308,7 +410,12 @@ function Detail() {
           <p><strong>รายละเอียด:</strong> {place.description}</p>
           <p><strong>ข้อมูลเพิ่มเติม:</strong>ยังไม่มีข้อมูลใส่</p>
           <p>
-            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.title)}`} target="_blank" rel="noopener noreferrer" className="location-link">
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.title)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="location-link"
+            >
               ดูพิกัดสถานที่บน Google Maps
             </a>
           </p>
@@ -343,6 +450,7 @@ function Detail() {
     </div>
   );
 }
+
 
 function renderStars(count) {
   return (
@@ -381,7 +489,8 @@ function Profile() {
     }
   }, []);
 
-  if (!user) return <p>กรุณาเข้าสู่ระบบเพื่อดูโปรไฟล์</p>;
+  if (!user) 
+    return <p>กรุณาเข้าสู่ระบบเพื่อดูโปรไฟล์</p>;
 
   return (
       <div className="profile-page">
