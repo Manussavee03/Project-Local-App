@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route, Link, Navigate, useNavigate, us
 import { useState, useEffect } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import axios from 'axios';
-import logo from "./assets/logos.png"; 
 import "./App.css";
 
 import { auth } 
@@ -109,26 +108,13 @@ function LogoutLink() {
 // Header
 function Header() {
   const [user, setUser] = useState(null);
-  const [logoUrl, setLogoUrl] = useState("");
-
+  const logoUrl = "https://cdn.discordapp.com/attachments/1145732688163119195/1373647773894836234/c.png?ex=682b2cae&is=6829db2e&hm=010bf06d860ceecde8bf35a7b51e42e4fa87dff4b845634fd8d30af0cbf4be81&"; // ใส่ลิงก์โลโก้ตรงนี้
+ 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
     return () => unsubscribe();
   }, []);
-
-  useEffect(() => {
-    const fetchLogo = async () => {
-      try {
-        const logoRef = ref(storage, "logos/logo.png"); // path ใน Firebase Storage
-        const url = await getDownloadURL(logoRef);
-        setLogoUrl(url);
-      } catch (error) {
-        console.error("ไม่สามารถโหลดโลโก้ได้:", error);
-      }
-    };
-    fetchLogo();
-  }, []);
-
+ 
   return (
     <header className="header">
       <div className="logo">
@@ -146,7 +132,7 @@ function Header() {
           />
         )}
       </div>
-
+ 
       <nav className="nav-links">
         {user ? (
           <>
@@ -166,6 +152,7 @@ function Header() {
     </header>
   );
 }
+ 
 
 
 
@@ -208,6 +195,7 @@ export async function getPlacesFromFirestore() {
       const description = fields.des?.stringValue || "des";
       const category = fields.type?.stringValue || "type";
       const imageUrl = fields.imge?.stringValue || "";
+      const src = fields.src?.stringValue || "";
 
       if (!placesByCategory[category]) placesByCategory[category] = [];
 
@@ -216,6 +204,7 @@ export async function getPlacesFromFirestore() {
         title,
         description,
         imageUrl,
+        src
       });
     });
 
@@ -233,7 +222,7 @@ function Home() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState(null);
   const navigate = useNavigate();
-
+ 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
@@ -247,16 +236,16 @@ function Home() {
     });
     return () => unsubscribe();
   }, [navigate]);
-
+ 
   if (loading) return <p>กำลังโหลด...</p>;
-
+ 
   const categories = Object.keys(placesData);
   const allPlaces = Object.values(placesData).flat();
-
+ 
   const handleViewDetails = (id) => navigate(`/detail/${id}`);
-
+ 
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
-
+ 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     const term = searchTerm.trim().toLowerCase();
@@ -274,14 +263,14 @@ function Home() {
       setSearchResults(filtered);
     }
   };
-
+ 
   const displayedPlaces =
     searchResults !== null
       ? searchResults
       : selectedCategory === "All"
       ? allPlaces
       : placesData[selectedCategory] || [];
-
+ 
   return (
     <div className="home">
       <Header />
@@ -290,18 +279,11 @@ function Home() {
         selectedCategory={selectedCategory}
         onSelectCategory={setSelectedCategory}
       />
-
-<<<<<<< HEAD
+ 
       <button className="custom-button" onClick={() => navigate("/events")}>
-=======
-      <button
-        onClick={() => navigate("/events")}
-        
-      >
->>>>>>> 9e116cf25dcc96e92c4a4fe0b9bfa318cea8c2e7
         กิจกรรม
       </button>
-
+ 
       <form onSubmit={handleSearchSubmit} style={{ margin: "20px" }}>
         <input
           type="text"
@@ -310,8 +292,6 @@ function Home() {
           onChange={handleSearchChange}
           style={{ padding: "8px 12px", width: "250px", marginRight: "10px" }}
         />
-
-
 
         <button type="submit" className="custom-button">
           ค้นหา
@@ -323,7 +303,7 @@ function Home() {
           </p>
         )}
       </form>
-
+ 
       {displayedPlaces.length === 0 ? (
         <p style={{ margin: "20px" }}>ไม่มีสถานที่ให้แสดง</p>
       ) : (
@@ -418,7 +398,7 @@ function Detail() {
         <div className="detail-text">
           <h2>{place.title}</h2>
           <p><strong>รายละเอียด:</strong> {place.description}</p>
-          <p><strong>ข้อมูลเพิ่มเติม:</strong> ยังไม่มีข้อมูลใส่</p>
+          <p><strong>ข้อมูลเพิ่มเติม:</strong> {place.src}</p>
           <p>
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.title)}`}
