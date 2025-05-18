@@ -190,11 +190,13 @@ export async function getPlacesFromFirestore() {
 
     documents.forEach((doc) => {
       const fields = doc.fields || {};
+      
       const id = doc.name.split("/").pop();
       const title = fields.name?.stringValue || "name";
       const description = fields.des?.stringValue || "des";
       const category = fields.type?.stringValue || "type";
       const imageUrl = fields.imge?.stringValue || "";
+      const src = fields.src?.stringValue || "";
 
       if (!placesByCategory[category]) placesByCategory[category] = [];
 
@@ -203,6 +205,7 @@ export async function getPlacesFromFirestore() {
         title,
         description,
         imageUrl,
+        src,
       });
     });
 
@@ -417,7 +420,7 @@ function Detail() {
         <div className="detail-text">
           <h2>{place.title}</h2>
           <p><strong>รายละเอียด:</strong> {place.description}</p>
-          <p><strong>ข้อมูลเพิ่มเติม:</strong> ยังไม่มีข้อมูลใส่</p>
+          <p><strong>ข้อมูลเพิ่มเติม:</strong> {place.src || "ยังไม่มีข้อมูลเพิ่มเติม"}</p>
           <p>
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.title)}`}
