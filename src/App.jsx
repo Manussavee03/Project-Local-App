@@ -642,7 +642,8 @@ function Register() {
           <div className="input-group"><input type="email" name="email" placeholder="อีเมล" onChange={handleChange} value={formData.email} /></div>
           <div className="input-group"><input type="password" name="password" placeholder="รหัสผ่าน" onChange={handleChange} value={formData.password} /></div>
           <div className="input-group"><input type="password" name="confirmPassword" placeholder="ยืนยันรหัสผ่าน" onChange={handleChange} value={formData.confirmPassword} /></div>
-          <button type="submit" className="auth-btn">สมัครสมาชิก</button>
+          <button type="submit" className="custom-button">สมัครสมาชิก</button>
+          
           {errorMessage && <p className="error-message">{errorMessage}</p>}
           <div className="extra-links"><Link to="/">กลับไปหน้า เข้าสู่ระบบ</Link></div>
         </form>
