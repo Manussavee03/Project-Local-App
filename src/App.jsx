@@ -100,21 +100,22 @@ function LogoutLink() {
   };
   return (
     <a href="#" onClick={handleLogout} style={{ color: "red", cursor: "pointer" }}>
-      Logout
+      ออกจากระบบ
     </a>
   );
 }
 
+
 // Header
 function Header() {
   const [user, setUser] = useState(null);
-  const logoUrl = "https://cdn.discordapp.com/attachments/1145732688163119195/1373647773894836234/c.png?ex=682b2cae&is=6829db2e&hm=010bf06d860ceecde8bf35a7b51e42e4fa87dff4b845634fd8d30af0cbf4be81&"; // ใส่ลิงก์โลโก้ตรงนี้
- 
+  const logoUrl = "https://cdn.discordapp.com/attachments/1145732688163119195/1373647773894836234/c.png?ex=682b2cae&is=6829db2e&hm=010bf06d860ceecde8bf35a7b51e42e4fa87dff4b845634fd8d30af0cbf4be81&";
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
     return () => unsubscribe();
   }, []);
- 
+
   return (
     <header className="header">
       <div className="logo">
@@ -131,14 +132,15 @@ function Header() {
             className="site-logo"
           />
         )}
+        <span className="site-name"> RAKSANA</span>
       </div>
- 
+
       <nav className="nav-links">
         {user ? (
           <>
             <Link to="/profile" className="profile-link" title="โปรไฟล์ของคุณ">
               <FaUserCircle
-                size={24}
+                size={20}
                 style={{ verticalAlign: "middle", marginRight: 6 }}
               />
               <span>{user.email}</span>
@@ -152,7 +154,8 @@ function Header() {
     </header>
   );
 }
- 
+
+
 
 
 
@@ -164,7 +167,8 @@ function CategoryMenu({ categories, selectedCategory, onSelectCategory }) {
         className={selectedCategory === "All" ? "active" : ""}
         onClick={() => onSelectCategory("All")}
       >
-        All
+        ทั้งหมด
+      
       </button>
       {categories.map((c) => (
         <button
@@ -272,7 +276,7 @@ function Home() {
       : placesData[selectedCategory] || [];
  
   return (
-    <div className="home">
+    <div className="home-body">
       <Header />
       <CategoryMenu
         categories={categories}
@@ -280,7 +284,7 @@ function Home() {
         onSelectCategory={setSelectedCategory}
       />
  
-      <button className="custom-button" onClick={() => navigate("/events")}>
+      <button className="custom-button2" onClick={() => navigate("/events")}>
         กิจกรรม
       </button>
  
@@ -305,23 +309,23 @@ function Home() {
       </form>
  
       {displayedPlaces.length === 0 ? (
-        <p style={{ margin: "20px" }}>ไม่มีสถานที่ให้แสดง</p>
-      ) : (
-        <div className="places-grid" style={{ padding: "0 20px 40px 20px" }}>
-          {displayedPlaces.map((place) => (
-            <div className="place-card" key={place.id}>
-              {place.imageUrl ? (
-                <img src={place.imageUrl} alt={place.title} />
-              ) : null}
-              <h3>{place.title}</h3>
-              <p>{place.description}</p>
-              <button onClick={() => handleViewDetails(place.id)}>
-                ดูข้อมูลเพิ่มเติม
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+      <p className="no-places-message">ไม่มีสถานที่ให้แสดง</p>
+    ) : (
+      <div className="places-grid">
+        {displayedPlaces.map((place) => (
+          <div className="place-card" key={place.id}>
+            {place.imageUrl ? (
+              <img src={place.imageUrl} alt={place.title} />
+            ) : null}
+            <h3>{place.title}</h3>
+            <p>{place.description}</p>
+            <button onClick={() => handleViewDetails(place.id)}>
+              ดูข้อมูลเพิ่มเติม
+            </button>
+          </div>
+        ))}
+      </div>
+    )}
     </div>
   );
 }
@@ -554,7 +558,7 @@ function Login_() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const email = params.get("email") || "";
+    const email = params.get("อีเมล") || "";
     const password = params.get("password") || "";
     setFormData({ email, password });
   }, []);
@@ -579,15 +583,15 @@ function Login_() {
     <div className="auth-body">
       <div className="auth-container">
         <form className="auth-form" onSubmit={handleSubmit}>
-          <h2>Login</h2>
+          <h2>เข้าสู่ระบบ</h2>
           <p>กรุณาเข้าสู่ระบบด้วยอีเมลและรหัสผ่าน</p>
           <div className="input-group">
-            <input type="email" name="email" placeholder="Email" onChange={handleChange} value={formData.email} />
+            <input type="email" name="email" placeholder="อีเมล" onChange={handleChange} value={formData.email} />
           </div>
           <div className="input-group">
-            <input type="password" name="password" placeholder="Password" onChange={handleChange} value={formData.password} />
+            <input type="password" name="password" placeholder="รหัสผ่าน" onChange={handleChange} value={formData.password} />
           </div>
-          <button type="submit" className="custom-button">Login</button>
+          <button type="submit" className="custom-button">เข้าสู่ระบบ</button>
           {errorMessage && <p className="error-message">{errorMessage}</p>}
           <div className="extra-links"><Link to="/register">สมัครสมาชิก</Link></div>
         </form>
@@ -633,14 +637,14 @@ function Register() {
     <div className="auth-body">
       <div className="auth-container">
         <form className="auth-form" onSubmit={handleRegister}>
-          <h2>Register</h2>
+          <h2>สมัครสมาชิก</h2>
           <p>กรอกข้อมูลเพื่อสมัครสมาชิก</p>
-          <div className="input-group"><input type="email" name="email" placeholder="Email" onChange={handleChange} value={formData.email} /></div>
-          <div className="input-group"><input type="password" name="password" placeholder="Password" onChange={handleChange} value={formData.password} /></div>
-          <div className="input-group"><input type="password" name="confirmPassword" placeholder="Confirm Password" onChange={handleChange} value={formData.confirmPassword} /></div>
+          <div className="input-group"><input type="email" name="email" placeholder="อีเมล" onChange={handleChange} value={formData.email} /></div>
+          <div className="input-group"><input type="password" name="password" placeholder="รหัสผ่าน" onChange={handleChange} value={formData.password} /></div>
+          <div className="input-group"><input type="password" name="confirmPassword" placeholder="ยืนยันรหัสผ่าน" onChange={handleChange} value={formData.confirmPassword} /></div>
           <button type="submit" className="auth-btn">สมัครสมาชิก</button>
           {errorMessage && <p className="error-message">{errorMessage}</p>}
-          <div className="extra-links"><Link to="/">กลับไปหน้า Login</Link></div>
+          <div className="extra-links"><Link to="/">กลับไปหน้า เข้าสู่ระบบ</Link></div>
         </form>
       </div>
     </div>
