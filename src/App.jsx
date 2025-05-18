@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Link, Navigate, useNavigate, us
 import { useState, useEffect } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import axios from 'axios';
-import logo from "./assets/logos.png"; 
+//import logo from "./assets/logos.png"; 
 import "./App.css";
 
 import { auth } 
@@ -109,24 +109,11 @@ function LogoutLink() {
 // Header
 function Header() {
   const [user, setUser] = useState(null);
-  const [logoUrl, setLogoUrl] = useState("");
+  const logoUrl = "https://cdn.discordapp.com/attachments/1145732688163119195/1373647773894836234/c.png?ex=682b2cae&is=6829db2e&hm=010bf06d860ceecde8bf35a7b51e42e4fa87dff4b845634fd8d30af0cbf4be81&"; // ใส่ลิงก์โลโก้ตรงนี้
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
     return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    const fetchLogo = async () => {
-      try {
-        const logoRef = ref(storage, "logos/logo.png"); // path ใน Firebase Storage
-        const url = await getDownloadURL(logoRef);
-        setLogoUrl(url);
-      } catch (error) {
-        console.error("ไม่สามารถโหลดโลโก้ได้:", error);
-      }
-    };
-    fetchLogo();
   }, []);
 
   return (
