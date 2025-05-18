@@ -153,26 +153,7 @@ function Header() {
   );
 }
 
-// Data
-const placesData = {
-  Beach: [
-    { id: 1, title: "วัดพระธาตุสุโทนมงคลคีรี", description: "วัดสวยงามและเป็นแหล่งท่องเที่ยวที่สำคัญของจังหวัด", imageUrl: "/src/assets/gallery2.jpg" },
-    { id: 2, title: "ชายหาดบางแสน", description: "ชายหาดยอดนิยมที่เหมาะกับการพักผ่อนและเล่นน้ำทะเล", imageUrl: "/src/assets/gallery1.jpg" },
-  ],
-  Culture: [
-    { id: 3, title: "วัดพระแก้ว", description: "สถานที่ท่องเที่ยวเชิงวัฒนธรรมที่สำคัญของกรุงเทพฯ", imageUrl: "/src/assets/gallery3.jpg" },
-    { id: 4, title: "พิพิธภัณฑ์พื้นบ้าน", description: "เรียนรู้วัฒนธรรมและประวัติศาสตร์ผ่านสิ่งของโบราณ", imageUrl: "/src/assets/culture2.jpg" },
-  ],
-  Nature: [
-    { id: 5, title: "อุทยานแห่งชาติ", description: "สัมผัสธรรมชาติและสัตว์ป่าหลากหลายชนิด", imageUrl: "/src/assets/nature1.jpg" },
-  ],
-  Temple: [
-    { id: 6, title: "วัดทอง", description: "วัดที่มีสถาปัตยกรรมงดงามและเป็นที่เคารพนับถือ", imageUrl: "/src/assets/temple1.jpg" },
-  ],
-  Lifestyle: [
-    { id: 7, title: "ตลาดนัดกลางคืน", description: "สนุกกับการช็อปปิ้งและลิ้มรสอาหารท้องถิ่น", imageUrl: "/src/assets/lifestyle1.jpg" },
-  ],
-};
+
 // CategoryMenu
 function CategoryMenu({ categories, selectedCategory, onSelectCategory }) {
   return (
