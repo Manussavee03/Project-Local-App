@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Link, Navigate, useNavigate, us
 import { useState, useEffect } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import axios from 'axios';
-//import logo from "./assets/logos.png"; 
+import logo from "./assets/logos.png"; 
 import "./App.css";
 
 import { auth } 
@@ -109,11 +109,24 @@ function LogoutLink() {
 // Header
 function Header() {
   const [user, setUser] = useState(null);
-  const logoUrl = "https://cdn.discordapp.com/attachments/1145732688163119195/1373647773894836234/c.png?ex=682b2cae&is=6829db2e&hm=010bf06d860ceecde8bf35a7b51e42e4fa87dff4b845634fd8d30af0cbf4be81&"; // ใส่ลิงก์โลโก้ตรงนี้
+  const [logoUrl, setLogoUrl] = useState("");
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
     return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        const logoRef = ref(storage, "logos/logo.png"); // path ใน Firebase Storage
+        const url = await getDownloadURL(logoRef);
+        setLogoUrl(url);
+      } catch (error) {
+        console.error("ไม่สามารถโหลดโลโก้ได้:", error);
+      }
+    };
+    fetchLogo();
   }, []);
 
   return (
@@ -190,13 +203,11 @@ export async function getPlacesFromFirestore() {
 
     documents.forEach((doc) => {
       const fields = doc.fields || {};
-      
       const id = doc.name.split("/").pop();
       const title = fields.name?.stringValue || "name";
       const description = fields.des?.stringValue || "des";
       const category = fields.type?.stringValue || "type";
       const imageUrl = fields.imge?.stringValue || "";
-      const src = fields.src?.stringValue || "";
 
       if (!placesByCategory[category]) placesByCategory[category] = [];
 
@@ -205,7 +216,6 @@ export async function getPlacesFromFirestore() {
         title,
         description,
         imageUrl,
-        src,
       });
     });
 
@@ -283,16 +293,7 @@ function Home() {
 
       <button
         onClick={() => navigate("/events")}
-        style={{
-          margin: "15px 20px",
-          padding: "10px 18px",
-          backgroundColor: "#1abc9c",
-          color: "white",
-          border: "none",
-          borderRadius: "6px",
-          cursor: "pointer",
-          fontWeight: "600",
-        }}
+        
       >
         กิจกรรม
       </button>
@@ -420,7 +421,7 @@ function Detail() {
         <div className="detail-text">
           <h2>{place.title}</h2>
           <p><strong>รายละเอียด:</strong> {place.description}</p>
-          <p><strong>ข้อมูลเพิ่มเติม:</strong> {place.src || "ยังไม่มีข้อมูลเพิ่มเติม"}</p>
+          <p><strong>ข้อมูลเพิ่มเติม:</strong> ยังไม่มีข้อมูลใส่</p>
           <p>
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.title)}`}
@@ -495,37 +496,65 @@ function Star({ filled, onClick }) {
   );
 }
 
-// Profile Page
 function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState({ firstName: "", lastName: "", gender: "", age: "", phone: "" });
+  const [editing, setEditing] = useState(false); // เปิด/ปิดฟอร์มแก้ไข
+  const [tempProfile, setTempProfile] = useState(profile); // เก็บข้อมูลชั่วคราวก่อนอัปเดต
 
   useEffect(() => {
     const currentUser = auth.currentUser;
     if (currentUser) {
       setUser(currentUser);
-      setProfile({ firstName: "สมชาย", lastName: "ใจดี", gender: "ชาย", age: "30", phone: "0812345678" });
+      const initialData = { firstName: " - ", lastName: " - ", gender: " - ", age: " - ", phone: " - " };
+      setProfile(initialData);
+      setTempProfile(initialData);
     }
   }, []);
 
-  if (!user) 
-    return <p>กรุณาเข้าสู่ระบบเพื่อดูโปรไฟล์</p>;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setTempProfile((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = () => {
+    setProfile(tempProfile);
+    setEditing(false);
+  };
+
+  if (!user) return <p>กรุณาเข้าสู่ระบบเพื่อดูโปรไฟล์</p>;
 
   return (
-      <div className="profile-page">
-        <button className="back-btn" onClick={() => navigate(-1)}>← กลับ</button>
-        <Header />
-        <div className="profile-container">
-          <h2>ข้อมูลโปรไฟล์</h2>
-          <div className="profile-item"><strong>อีเมล:</strong> <span>{user.email}</span></div>
-          <div className="profile-item"><strong>ชื่อจริง:</strong> <span>{profile.firstName}</span></div>
-          <div className="profile-item"><strong>นามสกุล:</strong> <span>{profile.lastName}</span></div>
-          <div className="profile-item"><strong>เพศ:</strong> <span>{profile.gender}</span></div>
-          <div className="profile-item"><strong>อายุ:</strong> <span>{profile.age}</span></div>
-          <div className="profile-item"><strong>เบอร์โทร:</strong> <span>{profile.phone}</span></div>
-        </div>
+    <div className="profile-page">
+      <button className="back-btn" onClick={() => navigate(-1)}>← กลับ</button>
+      <Header />
+      <div className="profile-container">
+        <h2>ข้อมูลโปรไฟล์</h2>
+        <div className="profile-item"><strong>อีเมล:</strong> <span>{user.email}</span></div>
+        <div className="profile-item"><strong>ชื่อจริง:</strong> <span>{profile.firstName}</span></div>
+        <div className="profile-item"><strong>นามสกุล:</strong> <span>{profile.lastName}</span></div>
+        <div className="profile-item"><strong>เพศ:</strong> <span>{profile.gender}</span></div>
+        <div className="profile-item"><strong>อายุ:</strong> <span>{profile.age}</span></div>
+        <div className="profile-item"><strong>เบอร์โทร:</strong> <span>{profile.phone}</span></div>
+        <button onClick={() => setEditing(true)}>แก้ไขโปรไฟล์</button>
       </div>
+
+      {editing && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>แก้ไขข้อมูลโปรไฟล์</h3>
+            <label>ชื่อจริง: <input type="text" name="firstName" value={tempProfile.firstName} onChange={handleChange} /></label>
+            <label>นามสกุล: <input type="text" name="lastName" value={tempProfile.lastName} onChange={handleChange} /></label>
+            <label>เพศ: <input type="text" name="gender" value={tempProfile.gender} onChange={handleChange} /></label>
+            <label>อายุ: <input type="number" name="age" value={tempProfile.age} onChange={handleChange} /></label>
+            <label>เบอร์โทร: <input type="text" name="phone" value={tempProfile.phone} onChange={handleChange} /></label>
+            <button onClick={handleSave}>บันทึก</button>
+            <button onClick={() => setEditing(false)}>ยกเลิก</button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
