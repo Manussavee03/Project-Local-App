@@ -3,13 +3,88 @@ import { useState, useEffect } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import axios from 'axios';
 import "./App.css";
-import { auth } from "./firebase";
+
+import { auth } 
+  from "./firebase";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   signOut
 } from "firebase/auth";
+
+
+
+const postEventToFirestore = async (token, eventData, collectionName) => {
+  if (!token) {
+    alert("Please login first");
+    return;
+  }
+
+  try {
+    const firestoreData = {
+      fields: {
+        title: { stringValue: eventData.title },
+        date: { stringValue: eventData.date },
+        time: { stringValue: eventData.time },
+        location: { stringValue: eventData.location },
+        description: { stringValue: eventData.description }
+      }
+    };
+
+    const res = await axios.post(
+      `https://firestore.googleapis.com/v1/projects/local-app-4351c/databases/(default)/documents/${collectionName}`,
+      firestoreData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      }
+    );
+
+    const firestoreID = res.data.name.split("/").pop();
+    return { ...eventData, event_id: firestoreID };
+  } catch (err) {
+    console.error("🔥 Error posting to Firestore:", err.response?.data || err.message);
+    alert("❌ ไม่สามารถบันทึกข้อมูลกิจกรรมได้");
+  }
+};
+
+const patchEventToFirestore = async (token, eventData, docId, collectionName) => {
+  const firestoreData = {
+    fields: {
+      title: { stringValue: eventData.title },
+      date: { stringValue: eventData.date },
+      time: { stringValue: eventData.time },
+      location: { stringValue: eventData.location },
+      description: { stringValue: eventData.description }
+    }
+  };
+
+  await axios.patch(
+    `https://firestore.googleapis.com/v1/projects/local-app-4351c/databases/(default)/documents/${collectionName}/${docId}`,
+    firestoreData,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      }
+    }
+  );
+};
+
+const deleteEventFromFirestore = async (token, docId, collectionName) => {
+  await axios.delete(
+    `https://firestore.googleapis.com/v1/projects/local-app-4351c/databases/(default)/documents/${collectionName}/${docId}`,
+    {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    }
+  );
+};
+
 
 // LogoutLink
 function LogoutLink() {
@@ -294,6 +369,7 @@ function Star({ filled, onClick }) {
 
 // Profile Page
 function Profile() {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState({ firstName: "", lastName: "", gender: "", age: "", phone: "" });
 
@@ -308,18 +384,19 @@ function Profile() {
   if (!user) return <p>กรุณาเข้าสู่ระบบเพื่อดูโปรไฟล์</p>;
 
   return (
-    <div className="profile-page">
-      <Header />
-      <div className="profile-container">
-        <h2>ข้อมูลโปรไฟล์</h2>
-        <div className="profile-item"><strong>อีเมล:</strong> <span>{user.email}</span></div>
-        <div className="profile-item"><strong>ชื่อจริง:</strong> <span>{profile.firstName}</span></div>
-        <div className="profile-item"><strong>นามสกุล:</strong> <span>{profile.lastName}</span></div>
-        <div className="profile-item"><strong>เพศ:</strong> <span>{profile.gender}</span></div>
-        <div className="profile-item"><strong>อายุ:</strong> <span>{profile.age}</span></div>
-        <div className="profile-item"><strong>เบอร์โทร:</strong> <span>{profile.phone}</span></div>
+      <div className="profile-page">
+        <button className="back-btn" onClick={() => navigate(-1)}>← กลับ</button>
+        <Header />
+        <div className="profile-container">
+          <h2>ข้อมูลโปรไฟล์</h2>
+          <div className="profile-item"><strong>อีเมล:</strong> <span>{user.email}</span></div>
+          <div className="profile-item"><strong>ชื่อจริง:</strong> <span>{profile.firstName}</span></div>
+          <div className="profile-item"><strong>นามสกุล:</strong> <span>{profile.lastName}</span></div>
+          <div className="profile-item"><strong>เพศ:</strong> <span>{profile.gender}</span></div>
+          <div className="profile-item"><strong>อายุ:</strong> <span>{profile.age}</span></div>
+          <div className="profile-item"><strong>เบอร์โทร:</strong> <span>{profile.phone}</span></div>
+        </div>
       </div>
-    </div>
   );
 }
 
@@ -437,78 +514,6 @@ function Register() {
 
 
 
-const postEventToFirestore = async (token, eventData, collectionName) => {
-  if (!token) {
-    alert("Please login first");
-    return;
-  }
-
-  try {
-    const firestoreData = {
-      fields: {
-        title: { stringValue: eventData.title },
-        date: { stringValue: eventData.date },
-        time: { stringValue: eventData.time },
-        location: { stringValue: eventData.location },
-        description: { stringValue: eventData.description }
-      }
-    };
-
-    const res = await axios.post(
-      `https://firestore.googleapis.com/v1/projects/local-app-4351c/databases/(default)/documents/${collectionName}`,
-      firestoreData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    );
-
-    const firestoreID = res.data.name.split("/").pop();
-    return { ...eventData, event_id: firestoreID };
-  } catch (err) {
-    console.error("🔥 Error posting to Firestore:", err.response?.data || err.message);
-    alert("❌ ไม่สามารถบันทึกข้อมูลกิจกรรมได้");
-  }
-};
-
-const patchEventToFirestore = async (token, eventData, docId, collectionName) => {
-  const firestoreData = {
-    fields: {
-      title: { stringValue: eventData.title },
-      date: { stringValue: eventData.date },
-      time: { stringValue: eventData.time },
-      location: { stringValue: eventData.location },
-      description: { stringValue: eventData.description }
-    }
-  };
-
-  await axios.patch(
-    `https://firestore.googleapis.com/v1/projects/local-app-4351c/databases/(default)/documents/${collectionName}/${docId}`,
-    firestoreData,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      }
-    }
-  );
-};
-
-const deleteEventFromFirestore = async (token, docId, collectionName) => {
-  await axios.delete(
-    `https://firestore.googleapis.com/v1/projects/local-app-4351c/databases/(default)/documents/${collectionName}/${docId}`,
-    {
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    }
-  );
-};
-
-
-
 
 function EventList() {
   const [user, setUser] = useState(null);
@@ -597,30 +602,33 @@ function EventList() {
   };
 
   return (
-    <div className="events-page">
-      <Header />
-      <h2>กิจกรรม</h2>
-      <button onClick={handleCreateNew} style={{ marginBottom: 15 }}>สร้างกิจกรรมใหม่</button>
-      {showForm && (
-        <EventForm
-          event={editingEvent}
-          onSave={handleSave}
-          onCancel={() => setShowForm(false)}
-        />
-      )}
-      <ul>
-        {events.map(event => (
-          <li key={event.event_id} style={{ marginBottom: 15, borderBottom: "1px solid #ccc", paddingBottom: 10 }}>
-            <strong>{event.title}</strong><br />
-            วันที่: {event.date} เวลา: {event.time}<br />
-            สถานที่: {event.location}<br />
-            รายละเอียด: {event.description}<br />
-            <button onClick={() => handleEdit(event)} style={{ marginRight: 8 }}>แก้ไข</button>
-            <button onClick={() => handleDelete(event.event_id)}>ลบ</button>
-          </li>
-        ))}
-      </ul>
-    </div>
+        <div className="auth-container">
+          <button className="back-btn" onClick={() => navigate(-1)}>← กลับ</button>
+          <div className="events-page">
+              <Header />
+              <h2>กิจกรรม</h2>
+              <button onClick={handleCreateNew} style={{ marginBottom: 15 }}>สร้างกิจกรรมใหม่</button>
+              {showForm && (
+                <EventForm
+                  event={editingEvent}
+                  onSave={handleSave}
+                  onCancel={() => setShowForm(false)}
+                />
+              )}
+              <ul>
+                {events.map(event => (
+                  <li key={event.event_id} style={{ marginBottom: 15, borderBottom: "1px solid #ccc", paddingBottom: 10 }}>
+                    <strong>{event.title}</strong><br />
+                    วันที่: {event.date} เวลา: {event.time}<br />
+                    สถานที่: {event.location}<br />
+                    รายละเอียด: {event.description}<br />
+                    <button onClick={() => handleEdit(event)} style={{ marginRight: 8 }}>แก้ไข</button>
+                    <button onClick={() => handleDelete(event.event_id)}>ลบ</button>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        </div>
   );
 }
 
