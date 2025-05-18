@@ -281,19 +281,7 @@ function Home() {
         onSelectCategory={setSelectedCategory}
       />
 
-      <button
-        onClick={() => navigate("/events")}
-        style={{
-          margin: "15px 20px",
-          padding: "10px 18px",
-          backgroundColor: "#1abc9c",
-          color: "white",
-          border: "none",
-          borderRadius: "6px",
-          cursor: "pointer",
-          fontWeight: "600",
-        }}
-      >
+      <button className="custom-button" onClick={() => navigate("/events")}>
         กิจกรรม
       </button>
 
@@ -305,20 +293,13 @@ function Home() {
           onChange={handleSearchChange}
           style={{ padding: "8px 12px", width: "250px", marginRight: "10px" }}
         />
-        <button
-          type="submit"
-          style={{
-            padding: "8px 16px",
-            backgroundColor: "#1abc9c",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontWeight: "600",
-          }}
-        >
+
+
+
+        <button type="submit" className="custom-button">
           ค้นหา
         </button>
+
         {searchResults && searchResults.length === 0 && (
           <p style={{ color: "red", marginTop: "8px" }}>
             ไม่พบสถานที่ที่ค้นหา
@@ -581,7 +562,7 @@ function Login_() {
           <div className="input-group">
             <input type="password" name="password" placeholder="Password" onChange={handleChange} value={formData.password} />
           </div>
-          <button type="submit" className="auth-btn">Login</button>
+          <button type="submit" className="custom-button">Login</button>
           {errorMessage && <p className="error-message">{errorMessage}</p>}
           <div className="extra-links"><Link to="/register">สมัครสมาชิก</Link></div>
         </form>
