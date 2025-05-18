@@ -109,10 +109,24 @@ function LogoutLink() {
 // Header
 function Header() {
   const [user, setUser] = useState(null);
+  const [logoUrl, setLogoUrl] = useState("");
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
     return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const fetchLogo = async () => {
+      try {
+        const logoRef = ref(storage, "logos/logo.png"); // path ใน Firebase Storage
+        const url = await getDownloadURL(logoRef);
+        setLogoUrl(url);
+      } catch (error) {
+        console.error("ไม่สามารถโหลดโลโก้ได้:", error);
+      }
+    };
+    fetchLogo();
   }, []);
 
   return (
@@ -126,8 +140,8 @@ function Header() {
           />
         ) : (
           <img
-            src="/assets/logos.jpg" // เปลี่ยนเป็น path ของโลโก้ของคุณ
-            alt="Raksana"
+            src={logoUrl || "/assets/fallback-logo.png"}
+            alt="Site Logo"
             className="site-logo"
           />
         )}
@@ -152,6 +166,7 @@ function Header() {
     </header>
   );
 }
+
 
 
 // CategoryMenu
