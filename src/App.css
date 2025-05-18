@@ -9,25 +9,22 @@
 
 
 .auth-body {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  
-  background: linear-gradient(535deg, #eae9e1, #eae9e1
- );
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 .auth-container {
-  background: #FDFCF8;
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  width: 420px;
+  background-color: rgba(255, 255, 255, 0.9); /* โปร่งใสเล็กน้อย */
+  padding: 2rem;
+  border-radius: 1rem;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
 }
 
 .auth-form h2 {
@@ -117,14 +114,11 @@
   font-family: 'Arial', sans-serif;
 }
 
-/* ---- Homepage Styling ---- */
 .home-body {
-  background-color: #FDFCF8;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  background-color: #fef7ec; /* หรือเปลี่ยนเป็นสีอื่นตามต้องการ */
+  min-height: 100vh;
+  padding: 20px;
 }
-
 
 
 .custom-button {
@@ -198,7 +192,7 @@
   justify-content: center;
   gap: 15px;
   padding: 15px;
-  background: #ffffff;
+  background: #FBAF3F;
   margin-top: 70px;
   width: 100%;
 }
@@ -338,7 +332,7 @@
  
 .places-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* แถวละ 2 ใบ */
+  grid-template-columns: repeat(3, 1fr); /* แถวละ 2 ใบ */
   gap: 20px;
   padding: 0 20px 40px 20px;
 }
@@ -427,7 +421,7 @@
 
   min-width: 280px; /* กำหนดความกว้างคงที่สำหรับเลื่อน */
 
-  border: 1px solid #ddd;
+  border: 1px solid #050505;
 
   border-radius: 8px;
 
@@ -502,25 +496,41 @@
   background-color: #f39e1d;
 
 }
- .detail-page {
-  max-width: 1000px;
-  margin: 0 auto 50px;
-  padding: 0 20px;
+.detail-page {
+  width: 90vw;                /* ความกว้าง 90% ของหน้าจอ */
+  max-width: 1200px;          /* ไม่ให้กว้างเกิน 1200px */
+  margin: 20px auto;          /* จัดกลางทั้งแนวตั้งและแนวนอน */
+  padding: 40px 30px;         /* ระยะห่างภายใน */
+  background-color: white;    /* พื้นหลังสีขาว */
+  border-radius: 16px;        /* ขอบมน */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* เงา */
 }
+
+
  
 .back-btn {
-  margin: 20px 0;
-  background: none;
+  position: fixed;
+  top: 100px;       /* จาก bottom → top */
+  left: 20px;
+  background-color: #ff6e51;
+  color: white;
   border: none;
-  color: #000000;
+  border-radius: 8px;
   font-size: 18px;
+  font-weight: bold;
+  padding: 10px 16px;
   cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  z-index: 1000;
 }
- 
+
 .back-btn:hover {
-  text-decoration: underline;
+  background-color: #ff4a26;
+  transform: scale(1.05);
 }
- 
+
+
 .detail-main {
   display: flex;
   gap: 40px;
@@ -608,8 +618,8 @@
 }
  
 .submit-rating-btn {
-  background-color: #ffd20a;
-  color: rgb(0, 0, 0);
+  background-color: #ffa41c;
+  color: rgb(255, 255, 255);
   border: none;
   padding: 8px 16px;
   border-radius: 6px;
@@ -618,7 +628,7 @@
 }
  
 .submit-rating-btn:hover {
-  background-color: #fdad02f1;
+  background-color: #de7512f1;
 }
  
 /* ดาวสำหรับรีวิวและให้คะแนน */
@@ -753,9 +763,9 @@
  
 .events-page button {
 
-  background-color: #ff6e51;
+  background-color: #ffc252;
 
-  color: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
 
   padding: 10px 18px;
 
@@ -773,7 +783,7 @@
  
 .events-page button:hover {
 
-  background-color: #ffb731;
+  background-color: #efab2b;
 
 }
  
@@ -887,7 +897,7 @@
  
 .event-form button {
 
-  background-color: #ff992c;
+  background-color: #d37b1c;
 
   color: white;
 
@@ -969,9 +979,7 @@
 
 .site-logo {
   border-radius: 8px; /* หรือ 0 หากต้องการเป็นสี่เหลี่ยมปกติ */
-<<<<<<< HEAD
-}
-=======
+
 }
 
 .modal {
@@ -999,4 +1007,51 @@
   width: 100%;
   margin-bottom: 10px;
 }
->>>>>>> 9e116cf25dcc96e92c4a4fe0b9bfa318cea8c2e7
+
+
+.custom-button2 {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 100px;
+  height: 100px;
+  background-color: #FBAF3F;
+  color: rgb(255, 255, 255);
+  border: none;
+  border-radius: 50%; /* ทำให้เป็นวงกลม */
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 18px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  z-index: 1000; /* ให้อยู่เหนือ element อื่น */
+}
+
+.custom-button2:hover {
+  background-color: #e99d2a;
+  transform: scale(1.05);
+}
+
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #fefefe;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(0, 0, 0, 0.87);
+  background-color: #242424;
+
+}
