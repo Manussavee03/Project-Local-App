@@ -3,19 +3,18 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 
+function RedirectPage() {
+  useEffect(() => {
+    sessionStorage.redirect = window.location.href;
+    window.location.replace('/');
+  }, []);
+
+  return <p>กำลังเปลี่ยนเส้นทาง...</p>;
+}
+
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <html>
-<head>
-<title>Page Title</title>
-</head>
-<body>
-
-<h1>My First Heading</h1>
-<p>My first paragraph.</p>
-
-</body>
-</html>
-
+    <RedirectPage />
   </StrictMode>,
 )
