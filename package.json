@@ -1,5 +1,6 @@
 {
   "name": "project-local-app",
+  "homepage": "https://username.github.io/project-local-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
