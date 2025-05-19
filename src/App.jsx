@@ -810,17 +810,15 @@ function EventForm({ event, onSave, onCancel }) {
 // Main App
 function App() {
   return (
-    <Router basename="/Project-Local-App">
-      <Routes>
-        <Route path="/" element={<Login_ />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/detail/:id" element={<Detail />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/events" element={<EventList />} />
-        <Route path="*" element={<Navigate to="/home" replace />} />
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/" element={<Login_ />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/home" element={<Home />} />
+      <Route path="/detail/:id" element={<Detail />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/events" element={<EventList />} />
+      <Route path="*" element={<Navigate to="/home" replace />} />
+    </Routes>
   );
 }
 
