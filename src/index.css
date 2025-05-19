@@ -25,7 +25,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
 
-  background-image: url('src/assets/นครลำปาง.jpg'); /* ปรับ path รูปให้ถูกต้อง */
+  background-image: url('https://cdn.discordapp.com/attachments/1145732688163119195/1373874291870924840/6ef9680341c9627c.jpg?ex=682bffa4&is=682aae24&hm=fb7a0572c626ab957b74043114d3d42cdec095d8cc1286e2527bd80c6dc9a4e5&'); /* ปรับ path รูปให้ถูกต้อง */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
