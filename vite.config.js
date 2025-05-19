@@ -3,6 +3,5 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/Project-Local-App/',  // << ใส่ให้ถูกตามชื่อ repo
   plugins: [react()],
 })
