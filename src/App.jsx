@@ -810,7 +810,7 @@ function EventForm({ event, onSave, onCancel }) {
 // Main App
 function App() {
   return (
-    <Router>
+    <Router basename="/Project-Local-App">
       <Routes>
         <Route path="/" element={<Login_ />} />
         <Route path="/register" element={<Register />} />
