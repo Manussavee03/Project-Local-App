@@ -1,8 +1,8 @@
 {
   "name": "project-local-app",
+  "homepage": "https://Manussavee03.github.io/Project-Local-App",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://Manussavee03.github.io/Project-Local-App",
   "type": "module",
   "scripts": {
     "dev": "vite",
