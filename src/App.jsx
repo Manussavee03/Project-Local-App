@@ -629,7 +629,7 @@ function Register() {
     try {
       await createUserWithEmailAndPassword(auth, formData.email, formData.password);
       alert("สมัครสมาชิกสำเร็จ!");
-      window.location.href = "/";
+      window.location.href = '/Project-Local-App/';
     } catch {
       setErrorMessage("สมัครสมาชิกไม่สำเร็จ! ลองใหม่อีกครั้ง");
     }
