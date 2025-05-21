@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, Link, Navigate, useNavigate, useParams } from "react-router-dom";
+//import { BrowserRouter as Router, Routes, Route, Link, Navigate, useNavigate, useParams } from "react-router-dom";
+import { HashRouter as Router, Routes, Route, Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import axios from 'axios';
@@ -12,6 +13,7 @@ import {
   onAuthStateChanged,
   signOut
 } from "firebase/auth";
+
 
 
 
@@ -109,7 +111,7 @@ function LogoutLink() {
 // Header
 function Header() {
   const [user, setUser] = useState(null);
-  const logoUrl = "https://cdn.discordapp.com/attachments/1145732688163119195/1373647773894836234/c.png?ex=682b2cae&is=6829db2e&hm=010bf06d860ceecde8bf35a7b51e42e4fa87dff4b845634fd8d30af0cbf4be81&";
+  const logoUrl = "https://media.discordapp.net/attachments/1145732688163119195/1373647773894836234/c.png?ex=682e786e&is=682d26ee&hm=b8e952382166d8efd2f295b2530c075768b66c8c0fca885dc8b6618f29feff07&=&format=webp&quality=lossless&width=583&height=544";
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
@@ -810,15 +812,17 @@ function EventForm({ event, onSave, onCancel }) {
 // Main App
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Login_ />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/home" element={<Home />} />
-      <Route path="/detail/:id" element={<Detail />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/events" element={<EventList />} />
-      <Route path="*" element={<Navigate to="/home" replace />} />
-    </Routes>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Login_ />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/detail/:id" element={<Detail />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/events" element={<EventList />} />
+        <Route path="*" element={<Navigate to="/home" replace />} />
+      </Routes>
+    </Router>
   );
 }
 

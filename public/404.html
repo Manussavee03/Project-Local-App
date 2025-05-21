@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Redirecting...</title>
+    <script type="text/javascript">
+      // Preserve path and query, redirect to index.html
+      var path = window.location.pathname.replace('/Project-Local-App', '');
+      var search = window.location.search || '';
+      var hash = window.location.hash || '';
+      window.location.replace('/Project-Local-App/?redirect=' + encodeURIComponent(path + search + hash));
+    </script>
+  </head>
+  <body>
+    <h1>Redirecting…</h1>
+  </body>
+</html>
